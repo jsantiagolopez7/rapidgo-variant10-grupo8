@@ -1,0 +1,17 @@
+{
+  "event_id": "7f3c2a10-5b8e-4c1d-9a2f-1e6d0b9c4a71",
+  "team": "grupo8",
+  "event_type": "ITEM_PICKED",
+  "event_ts": "2026-10-22T14:03:11Z",
+  "store_id": "STORE-03",
+  "order_id": "ORD-000123",
+  "sku": "SKU-1042",
+  "category": "lacteos",
+  "qty_requested": 3,
+  "qty_picked": 2,
+  "stock_before": 2,
+  "stock_after": 0,
+  "picker_id": "PK-07",
+  "pick_start_ts": "2026-10-22T14:01:40Z",
+  "pick_end_ts": "2026-10-22T14:03:11Z"
+}
