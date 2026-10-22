@@ -15,8 +15,11 @@ Topic `rapidgo.g8.inventory.events`, key `store_id`, 3 particiones, factor de re
 - Con `store_id` todos los eventos de una tienda caen en la misma partición y se conserva su orden.
 - Con `sku` los SKUs más vendidos concentrarían eventos en pocas particiones y una misma tienda quedaría repartida.
 - Sin key se pierde el orden por tienda.
-- TODO (equipo): pegar aquí la salida real de `kafka-topics.sh --describe` y el conteo de mensajes por partición al correr el producer con N tiendas.
-
+- Topic: rapidgo.g8.inventory.events  TopicId: 8U4jsqthR2mtTCr3POYVNg PartitionCount: 3   ReplicationFactor: 1   Configs:
+         Topic: rapidgo.g8.inventory.events   Partition: 0   Leader: 1   Replicas: 1  Isr: 1   Elr:  LastKnownElr:
+         Topic: rapidgo.g8.inventory.events   Partition: 1   Leader: 1   Replicas: 1  Isr: 1   Elr:  LastKnownElr:
+         Topic: rapidgo.g8.inventory.events   Partition: 2   Leader: 1   Replicas: 1  Isr: 1   Elr:  LastKnownElr:
+  “Análisis detallado en docs/topic-rapidgo-g8-inventory-events.md”.
 ## Consecuencias / trade-offs
 - Con pocas tiendas puede haber particiones desbalanceadas; por eso se simulan al menos 8 tiendas.
 - Más de 3 particiones no aporta en local, pero se puede subir más adelante sin cambiar la key.
