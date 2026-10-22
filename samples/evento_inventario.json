@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "event_id": "c41e9b7a-2d05-4f68-8a13-90b7e5d2f6c3",
+  "team": "grupo8",
+  "event_type": "ITEM_OUT_OF_STOCK",
+  "event_ts": "2026-10-22T09:41:50Z",
+  "store_id": "STORE-07",
+  "order_id": "ORD-004512",
+  "sku": "SKU-2087",
+  "category": "aseo",
+  "zone": "pasillo-4",
+  "priority": "express",
+  "qty_requested": 2,
+  "qty_picked": 0,
+  "stock_before": 0,
+  "stock_after": 0,
+  "picker_id": "PK-12",
+  "pick_start_ts": "2026-10-22T09:41:05Z",
+  "pick_end_ts": "2026-10-22T09:41:50Z"
+}
