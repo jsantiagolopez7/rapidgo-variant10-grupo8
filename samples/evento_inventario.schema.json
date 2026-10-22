@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Contrato de evento de inventario y picking - RapidGo Grupo 8",
+  "type": "object",
+  "required": ["schema_version", "event_id", "team", "event_type", "event_ts", "store_id",
+               "order_id", "sku", "qty_requested", "qty_picked", "stock_before", "stock_after",
+               "pick_start_ts", "pick_end_ts"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "event_id": {"type": "string", "minLength": 1},
+    "team": {"const": "grupo8"},
+    "event_type": {"enum": ["ITEM_PICKED", "ITEM_OUT_OF_STOCK", "STOCK_REPLENISHED"]},
+    "event_ts": {"type": "string", "format": "date-time"},
+    "store_id": {"type": "string", "pattern": "^STORE-[0-9]{2}$"},
+    "order_id": {"type": "string", "pattern": "^ORD-[0-9]{6}$"},
+    "sku": {"type": "string", "pattern": "^SKU-[0-9]{4}$"},
+    "category": {"enum": ["lacteos", "aseo", "carnes", "bebidas", "granos"]},
+    "zone": {"type": "string"},
+    "priority": {"enum": ["normal", "express"]},
+    "qty_requested": {"type": "integer", "minimum": 1},
+    "qty_picked": {"type": "integer", "minimum": 0},
+    "stock_before": {"type": "integer", "minimum": 0},
+    "stock_after": {"type": "integer", "minimum": 0},
+    "picker_id": {"type": "string", "pattern": "^PK-[0-9]{2}$"},
+    "pick_start_ts": {"type": "string", "format": "date-time"},
+    "pick_end_ts": {"type": "string", "format": "date-time"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"event_type": {"const": "ITEM_OUT_OF_STOCK"}}},
+      "then": {"properties": {"qty_picked": {"const": 0}, "stock_after": {"const": 0}}}
+    }
+  ],
+  "additionalProperties": false
+}
