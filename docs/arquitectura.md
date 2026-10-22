@@ -1,4 +1,4 @@
-## 3 KPIs
+## 3 KPIs (Indicador clave de desempeño)
 
 | KPI | Cálculo | Granularidad |
 |---|---|---|
