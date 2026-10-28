@@ -1,3 +1,14 @@
+# Arquitectura - Variante 10: Inventario y fulfillment
+
+flowchart LR
+  P[Producer Python<br/>tiendas, SKUs, pickers] -->|key = store_id| K[(Kafka<br/>rapidgo.g8.inventory.events<br/>3 particiones)]
+  K --> S[Spark Structured Streaming<br/>validación, transformaciones,<br/>ventana 5 min por tienda]
+  S --> R[(Raw)]
+  S --> PR[(Processed)]
+  S --> C[(Curated<br/>KPIs + alertas)]
+  C --> A[Airflow DAG<br/>calidad → agregación diaria → reporte]
+  A --> O[Reporte de KPIs<br/>y alertas por tienda]
+  
 ## 3 KPIs (Indicador clave de desempeño)
 
 | KPI | Cálculo | Granularidad |
