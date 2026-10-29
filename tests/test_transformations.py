@@ -75,9 +75,11 @@ def test_json_corrupto_se_descarta(spark):
 
 def test_alerta_stock_critico(spark):
     eventos = [
-        evento(event_id="a", stock_after=0, event_type="ITEM_OUT_OF_STOCK", qty_picked=0),
+        evento(event_id="a", stock_before=3, stock_after=0),
         evento(event_id="b", stock_after=5),
         evento(event_id="c", stock_after=6),
+        # ya estaba en 0: no alerta, cuenta en stockout_rate (ADR-002)
+        evento(event_id="d", stock_before=0, stock_after=0, event_type="ITEM_OUT_OF_STOCK", qty_picked=0),
     ]
     res = {r["event_id"]: r["severity"] for r in alerta_stock_critico(procesar(spark, eventos)).collect()}
     assert res == {"a": "ALTA", "b": "MEDIA"}

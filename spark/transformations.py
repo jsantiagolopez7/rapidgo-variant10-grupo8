@@ -112,9 +112,13 @@ _ALERT_COLS = ["alert_type", "severity", "event_id", "event_ts", "store_id", "or
 
 
 def alerta_stock_critico(df: DataFrame) -> DataFrame:
-    """Alerta 1: stock_after <= 5 (severidad ALTA si el stock queda en 0)."""
+    """Alerta 1: un picking deja stock_after <= 5 (severidad ALTA si queda en 0).
+
+    Los ITEM_OUT_OF_STOCK no alertan: el producto ya estaba en 0 y ese quiebre
+    se mide en el KPI stockout_rate (ver ADR-002).
+    """
     return (
-        df.filter(F.col("event_type").isin(PICKING_EVENTS) & (F.col("stock_after") <= STOCK_CRITICO_MAX))
+        df.filter((F.col("event_type") == "ITEM_PICKED") & (F.col("stock_after") <= STOCK_CRITICO_MAX))
         .withColumn("alert_type", F.lit("STOCK_CRITICO"))
         .withColumn("severity", F.when(F.col("stock_after") == 0, "ALTA").otherwise("MEDIA"))
         .withColumn("detected_at", F.current_timestamp())
