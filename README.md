@@ -64,8 +64,41 @@ docker compose down        # conserva datos
 docker compose down -v     # borra volúmenes
 ```
 
+## Pipeline de streaming (Semana 2)
+
+Necesitas dos terminales, ambas en la carpeta del proyecto.
+
+**Terminal 1: levantar todo y arrancar el job de Spark**
+```bash
+docker compose up -d
+docker compose exec spark-master /opt/spark/bin/spark-submit \
+  --master local[2] \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.3 \
+  /opt/app/spark/streaming_job.py
+```
+La primera vez descarga el conector de Kafka (1 o 2 minutos). Déjalo corriendo.
+
+**Terminal 2: enviar eventos**
+```bash
+docker compose run --rm producer --max-events 0 --rate 5   # continuo, Ctrl+C para parar
+```
+Los KPIs por ventana de 5 minutos aparecen cuando la ventana cierra (5 min + 1 min de watermark), así que deja el producer corriendo al menos 8 minutos.
+
+**Revisar el Data Lake**
+```bash
+docker compose exec spark-master /opt/spark/bin/spark-submit /opt/app/spark/revisar_datalake.py
+```
+Los archivos Parquet quedan en `datalake/raw`, `datalake/processed` y `datalake/curated`.
+
+## Pruebas
+```bash
+pip install -r requirements.txt
+pytest -v
+```
+GitHub Actions ejecuta las mismas pruebas en cada Pull Request (`.github/workflows/ci.yml`).
+
 ## Estado
 - [x] v0.1.0-foundation: diseño y organización
-- [ ] v0.2.0-streaming
+- [x] v0.2.0-streaming: Kafka + Spark + Data Lake + CI
 - [ ] v0.3.0-orchestration
 - [ ] v1.0.0

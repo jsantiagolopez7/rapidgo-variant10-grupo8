@@ -59,16 +59,41 @@ services:
     image: apache/spark:3.5.3
     container_name: spark-master
     hostname: spark-master
+    user: root   # para poder escribir en ./datalake y descargar el conector de Kafka
     command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
     environment:
       SPARK_MASTER_HOST: spark-master
       SPARK_MASTER_PORT: 7077
       SPARK_MASTER_WEBUI_PORT: 8080
+      KAFKA_BOOTSTRAP: kafka:9092
+      DATALAKE_PATH: /opt/app/datalake
     ports:
       - "8080:8080"
       - "7077:7077"
+      - "4040:4040"   # UI del job de streaming mientras corre
     volumes:
-      - ./jobs:/opt/spark/jobs
+      - ./spark:/opt/app/spark
+      - ./datalake:/opt/app/datalake
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    networks:
+      - bigdata
+
+  # ---------- Producer de eventos (se ejecuta a demanda) ----------
+  # docker compose run --rm producer                    -> 500 eventos a 5 por segundo
+  # docker compose run --rm producer --max-events 0     -> continuo (Ctrl+C para parar)
+  producer:
+    image: python:3.12-slim
+    profiles: ["producer"]
+    working_dir: /app
+    volumes:
+      - ./producer:/app
+    environment:
+      KAFKA_BOOTSTRAP: kafka:9092
+      PYTHONUNBUFFERED: "1"
+    entrypoint: ["sh", "-c", "pip install -q --disable-pip-version-check kafka-python==2.2.15 && exec python producer.py \"$$@\"", "--"]
+    command: ["--max-events", "500", "--rate", "5"]
     depends_on:
       kafka-init:
         condition: service_completed_successfully

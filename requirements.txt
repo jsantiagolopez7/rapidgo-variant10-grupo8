@@ -1,4 +1,4 @@
-kafka-python==2.0.2
+kafka-python==2.2.15
 pyspark==3.5.3
 pytest==8.3.3
 jsonschema==4.23.0
