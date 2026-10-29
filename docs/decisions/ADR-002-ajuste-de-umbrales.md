@@ -45,7 +45,7 @@ PICKING_LENTO | MEDIA |  285
 STOCK_CRITICO | ALTA  | 3727
 STOCK_CRITICO | MEDIA |  518
 ```
-- PR relacionado: #[número del PR de este ADR]
+- PR relacionado: #28
 
 ## Consecuencias / trade-offs
 - **Se gana:** muchas menos alertas y cada una significa algo nuevo (un SKU que acaba de quedar en 5 o menos). Según los datos de esta corrida, las alertas de stock crítico bajan de unas 4.245 a cerca de 900.
