@@ -13,7 +13,7 @@ from transformations import (
     parse_events, validate_events, enrich_events, kpis_por_tienda, construir_alertas,
 )
 
-BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "kafka:29092")
+BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "kafka:9092")
 TOPIC = os.getenv("KAFKA_TOPIC", "rapidgo.g8.inventory.events")
 STARTING_OFFSETS = os.getenv("STARTING_OFFSETS", "earliest")
 LAKE = os.getenv("DATALAKE_PATH", "/opt/app/datalake")
