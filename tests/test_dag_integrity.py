@@ -4,6 +4,7 @@ Se ejecuta en el job 'dag' del CI (tiene Airflow instalado). En un entorno sin A
 (por ejemplo, el job normal de pytest) las pruebas se omiten solas.
 """
 import os
+import sys
 from pathlib import Path
 
 import pytest
@@ -18,6 +19,9 @@ MIN_TASKS = 5
 
 @pytest.fixture(scope="module")
 def dagbag():
+    # Airflow agrega la carpeta de DAGs al sys.path cuando corre de verdad; aquí lo hacemos
+    # a mano para que un DAG pueda importar módulos vecinos (ej. import calidad_inventario).
+    sys.path.insert(0, str(DAGS_FOLDER))
     return DagBag(dag_folder=str(DAGS_FOLDER), include_examples=False)
 
 
