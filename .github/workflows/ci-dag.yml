@@ -1,0 +1,36 @@
+name: CI DAG Airflow
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  dag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Instalar Airflow y librerías del DAG (con constraints oficiales)
+        run: |
+          pip install "apache-airflow==2.10.5" pandas pyarrow \
+            --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.5/constraints-3.12.txt"
+          pip install pytest
+
+      - name: Validar sintaxis de los DAG
+        run: python -m compileall airflow
+
+      - name: Validar importación y estructura del DAG
+        env:
+          AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+          AIRFLOW_HOME: ${{ runner.temp }}/airflow
+        run: pytest tests/test_dag_integrity.py -v
