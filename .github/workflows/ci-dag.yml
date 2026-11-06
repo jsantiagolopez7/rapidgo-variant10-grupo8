@@ -20,9 +20,9 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
 
-      - name: Instalar Airflow (con constraints oficiales)
+      - name: Instalar Airflow y librerías del DAG (con constraints oficiales)
         run: |
-          pip install "apache-airflow==2.10.5" \
+          pip install "apache-airflow==2.10.5" pandas pyarrow \
             --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.5/constraints-3.12.txt"
           pip install pytest
 
