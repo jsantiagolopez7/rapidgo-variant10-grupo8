@@ -38,6 +38,7 @@ Servicios del `docker-compose.yml`:
 - **kafka**: Kafka 3.9.0 en modo KRaft (sin Zookeeper)
 - **kafka-init**: crea el topic `rapidgo.g8.inventory.events` (3 particiones) y termina
 - **spark-master**: Spark 3.5.3 master (UI en http://localhost:8080)
+- **airflow**: Airflow 2.10.5 en modo standalone (UI en http://localhost:8081, usuario `admin`, contraseña `admin`)
 
 ```bash
 docker compose config -q     # valida (sin salida = OK)
@@ -90,15 +91,49 @@ docker compose exec spark-master /opt/spark/bin/spark-submit /opt/app/spark/revi
 ```
 Los archivos Parquet quedan en `datalake/raw`, `datalake/processed` y `datalake/curated`.
 
+## Orquestación con Airflow (Semana 3)
+
+El streaming sigue corriendo en `spark-master`. Airflow corre una vez al día el DAG `rapidgo_g8_inventario_diario`, que lee el Data Lake ([ADR-003](docs/decisions/ADR-003-orquestacion-y-recuperacion.md)):
+
+```
+check_sources -> validate_raw -> aggregate_daily_kpis -> validate_curated -> generate_report
+```
+
+| Task | Qué hace | XCom que devuelve |
+|---|---|---|
+| `check_sources` | raw y processed existen y tienen registros | rutas y conteos |
+| `validate_raw` | máximo 5 % de eventos fuera del contrato | total, válidos, inválidos |
+| `aggregate_daily_kpis` | KPIs por día y tienda → `datalake/curated/kpis_diarios/` | ruta y filas |
+| `validate_curated` | nulos, duplicados, tasas en [0, 1], tiempos ≥ 0 | resumen |
+| `generate_report` | reporte Markdown → `airflow/reports/` | ruta del reporte |
+
+Todas las tasks tienen 2 retries con backoff exponencial. El código está en `airflow/dags/` y las reglas de calidad en `airflow/dags/calidad_inventario.py`.
+
+**Ejecutar el DAG** (con el pipeline de streaming corriendo unos minutos):
+1. Abre http://localhost:8081 (usuario `admin`, contraseña `admin`).
+2. Activa el DAG `rapidgo_g8_inventario_diario` con el interruptor de la izquierda. Al activarlo, Airflow también crea la ejecución programada del día anterior.
+3. Pulsa ▶ (*Trigger DAG*) y mira la vista *Grid*: las 5 tasks deben quedar en verde.
+
+Desde la terminal:
+```bash
+docker compose exec airflow airflow dags unpause rapidgo_g8_inventario_diario
+docker compose exec airflow airflow dags trigger rapidgo_g8_inventario_diario
+docker compose exec airflow airflow dags list-runs -d rapidgo_g8_inventario_diario
+```
+
+**Fallo controlado:** con el Data Lake vacío (o disparando el DAG con la configuración `{"raw_subdir": "raw/vacio"}`), `check_sources` falla después de 3 intentos y las demás tasks quedan en `upstream_failed`. Se recupera corrigiendo la causa y haciendo *Clear* de la ejecución. Ver [docs/checkpoints/semana3.md](docs/checkpoints/semana3.md).
+
 ## Pruebas
 ```bash
 pip install -r requirements.txt
 pytest -v
 ```
-GitHub Actions ejecuta las mismas pruebas en cada Pull Request (`.github/workflows/ci.yml`).
+GitHub Actions ejecuta en cada Pull Request (`.github/workflows/ci.yml`):
+- **validar**: sintaxis, pruebas de contrato, Spark y reglas de calidad, y `docker compose config`.
+- **validar-dag**: instala Airflow, importa el DAG sin errores y lo corre completo con `dag.test()` sobre un Data Lake de prueba, incluido el fallo con raw vacío (`tests/test_dag_airflow.py`).
 
 ## Estado
 - [x] v0.1.0-foundation: diseño y organización
 - [x] v0.2.0-streaming: Kafka + Spark + Data Lake + CI
-- [ ] v0.3.0-orchestration
+- [x] v0.3.0-orchestration: Airflow + calidad + CI ampliado
 - [ ] v1.0.0

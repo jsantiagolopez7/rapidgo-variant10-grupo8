@@ -12,3 +12,5 @@ datalake/processed/
 datalake/curated/
 datalake/checkpoints/
 airflow/logs/
+
+airflow/reports/

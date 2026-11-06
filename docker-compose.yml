@@ -100,6 +100,43 @@ services:
     networks:
       - bigdata
 
+  # ---------- Airflow 2.10 (standalone: scheduler + webserver en un contenedor) ----------
+  # UI en http://localhost:8081 (usuario admin / contraseña admin)
+  airflow:
+    image: apache/airflow:2.10.5-python3.12
+    container_name: airflow
+    hostname: airflow
+    user: "0:0"   # igual que spark-master: escribe en ./datalake y ./airflow sin problemas de permisos en Linux
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "True"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+      DATALAKE_PATH: /opt/airflow/datalake
+      REPORTS_PATH: /opt/airflow/reports
+    command:
+      - bash
+      - -c
+      - |
+        airflow db migrate &&
+        (airflow users create --username admin --password admin --firstname Admin \
+           --lastname Grupo8 --role Admin --email admin@example.com || true) &&
+        exec airflow standalone
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/reports:/opt/airflow/reports
+      - ./datalake:/opt/airflow/datalake
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    networks:
+      - bigdata
+
 networks:
   bigdata:
     driver: bridge
