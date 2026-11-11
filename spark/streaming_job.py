@@ -19,6 +19,10 @@ STARTING_OFFSETS = os.getenv("STARTING_OFFSETS", "earliest")
 LAKE = os.getenv("DATALAKE_PATH", "/opt/app/datalake")
 TRIGGER = os.getenv("TRIGGER", "10 seconds")
 WATERMARK = os.getenv("WATERMARK", "1 minute")
+# Spark usa 200 particiones de shuffle por defecto: con 3 consultas con estado (dedup, KPIs y
+# alertas) eso son cientos de state stores por micro-batch y en un portátil un lote tardaba
+# más de 10 minutos. Con 4 particiones basta para el volumen del proyecto (Semana 4).
+SHUFFLE_PARTITIONS = os.getenv("SHUFFLE_PARTITIONS", "4")
 
 
 def read_kafka(spark):
@@ -46,7 +50,9 @@ def start_sink(df, name, path, partition_by=None):
 
 
 def main():
-    spark = SparkSession.builder.appName("g8-inventory-streaming").getOrCreate()
+    spark = (SparkSession.builder.appName("g8-inventory-streaming")
+             .config("spark.sql.shuffle.partitions", SHUFFLE_PARTITIONS)
+             .getOrCreate())
     spark.sparkContext.setLogLevel("WARN")
 
     kafka_df = read_kafka(spark)

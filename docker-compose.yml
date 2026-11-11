@@ -22,14 +22,17 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      # Sin esto la imagen guarda los logs en /tmp/kraft-combined-logs (dentro del contenedor)
+      # y el volumen kafka-data no se usa: un "docker compose down" borraba todos los eventos.
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
     volumes:
       - kafka-data:/var/lib/kafka/data
     healthcheck:
       test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
       interval: 15s
       timeout: 10s
-      retries: 10
-      start_period: 20s
+      retries: 20        # en un portátil con poca RAM Kafka tardó más de 4 min en quedar healthy
+      start_period: 60s
     networks:
       - bigdata
 

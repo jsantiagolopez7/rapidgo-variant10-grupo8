@@ -29,11 +29,11 @@ Opción 2, con validación temprana (*fail fast*) y reintentos:
 ## Evidencia utilizada
 - Ejecución de prueba del 05/11/2026 con el pipeline completo en Docker: 2.044 eventos en raw (0 inválidos), 1.944 eventos de picking en 8 tiendas; el DAG terminó en verde en unos 16 segundos y generó el reporte con stockout global de 24,69 % y picking promedio de 165,5 s.
 - Fallo controlado: con el Data Lake vacío, `check_sources` falló en sus 3 intentos con `ErrorCalidad: La fuente /opt/airflow/datalake/raw/inventory_events no existe. ¿Corrió el job de Spark?` y las 4 tasks siguientes quedaron en `upstream_failed`. Ver [semana3.md](../checkpoints/semana3.md) para la ejecución del equipo.
-- El CI (job `validar-dag`) corre el DAG completo con `dag.test()` sobre un Data Lake de prueba y verifica también que falle con raw vacío.
+- El CI tiene un workflow propio para el DAG (`.github/workflows/ci-dag.yml`, job `dag`): instala Airflow 2.10.5, compila `airflow/` y corre `tests/test_dag_integrity.py`, que importa el DAG con `DagBag` sin errores y verifica que tenga al menos 5 tasks, todas con dependencias y con retries. Las reglas de calidad (`calidad_inventario.py`), incluido el fallo con raw vacío, se prueban en `tests/test_calidad_inventario.py` dentro del workflow `CI RapidGo`.
 
 ## Consecuencias / trade-offs
 - (+) Los KPIs diarios solo se publican cuando la fuente y el resultado pasan las reglas de calidad.
 - (+) Los fallos transitorios se resuelven solos con los reintentos y los permanentes quedan visibles en rojo con un mensaje claro.
-- (−) Airflow no reinicia el streaming si se cae; eso se detecta al día siguiente en `check_sources`. Un sensor o una alerta de salud del job queda como mejora para la Semana 4.
+- (−) Airflow no reinicia el streaming si se cae; eso se detecta al día siguiente en `check_sources`. Un sensor o una alerta de salud del job queda como trabajo futuro (ver README, Limitaciones).
 - (−) Con los reintentos y el backoff, un fallo permanente tarda unos 2 minutos en marcarse como `failed`.
 - (−) `aggregate_daily_kpis` lee todo `processed/` con pandas. Sirve para el volumen del proyecto (miles de eventos); con millones habría que filtrar por la partición `fecha` o pasar esa task a Spark.

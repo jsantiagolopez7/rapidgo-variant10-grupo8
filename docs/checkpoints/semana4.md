@@ -1,0 +1,20 @@
+# Checkpoint Semana 4
+
+1. **Qué quedó funcionando esta semana:** el pipeline completo (Kafka → Spark → Data Lake → Airflow) corre desde cero siguiendo solo el README, y el release v1.0.0 se publica con un quality gate: el workflow `Release RapidGo` repite las pruebas y la validación del DAG, y solo crea el tag si todo pasa.
+
+2. **Valor real observado en la prueba de integración (11/11/2026, portátil Windows con 6 GB de RAM, Docker con 3,8 GB):**
+   - Producer (unos 12 minutos a 5 eventos/s): 3.731 eventos (+59 duplicados a propósito). Por tipo: 2.087 `ITEM_PICKED`, 1.546 `ITEM_OUT_OF_STOCK`, 98 `STOCK_REPLENISHED`. Por partición: 1.825 / 946 / 1.019.
+   - Data Lake (`revisar_datalake.py`): raw 3.790 (= 3.731 + 59, no se perdió ningún mensaje), processed 3.731 (la deduplicación quitó los 59 duplicados), 24 filas de KPIs (8 tiendas × 3 ventanas de 5 min) y 884 alertas (437 STOCK_CRITICO media, 267 STOCK_CRITICO alta, 180 PICKING_LENTO).
+   - Indicadores globales: picking promedio 163,3 s, p95 240 s, stockout 42,55 %. Eventos por tienda entre 400 (STORE-07) y 512 (STORE-02).
+   - DAG `rapidgo_g8_inventario_diario`: la ejecución manual (iniciada el 11/11/2026 a las 20:29:16 UTC) y la programada del 10/11 terminaron con las 5 tasks en `success` (captura `DAG semana4 grid.png`); la manual tardó menos de 1 minuto. El reporte [`reporte_inventario_2026-11-11.md`](reporte_inventario_2026-11-11.md) muestra 3.790 eventos en raw (0 fuera del contrato), 3.633 eventos de picking, KPIs para 8 tiendas, stockout global 42,55 %, picking promedio 163,3 s y 988 de 1.442 pedidos incompletos.
+
+3. **Decisión técnica tomada y por qué:** el release se publica desde un workflow (`release.yml`) y no a mano, para que no pueda salir un tag si las pruebas fallan (quality gate). Cada integrante corrió el workflow con `publicar = false` y solo la última corrida, con todo en verde, creó v1.0.0.
+
+4. **Problemas encontrados y cómo se resolvieron** (al seguir el README desde cero en un portátil):
+   - **Kafka "unhealthy" al primer `docker compose up -d`:** Airflow arrancaba al mismo tiempo, el equipo quedaba sin CPU, el broker registraba `heartbeat ... REQUEST_TIMED_OUT` y Kafka tardó más de 4 minutos en quedar listo (`dependency failed to start: container kafka is unhealthy`). Se resolvió levantando primero Kafka y Spark, y Airflow después.
+   - **Memoria:** Docker tenía solo 2,78 GB. Con streaming, `revisar_datalake.py` y Airflow a la vez, Spark falló con `java.io.IOException: Cannot allocate memory` y el streaming murió con `Py4JNetworkError`. Se subió el límite de WSL a 4 GB (`.wslconfig`) y se corrieron los servicios pesados por turnos.
+   - **Spark muy lento:** un micro-batch tardó 623 s (`Current batch is falling behind ... spent 623229 milliseconds`) con un trigger de 10 s. Spark usa 200 particiones de shuffle por defecto, y el job tiene 3 consultas con estado (dedup, KPIs y alertas): cientos de state stores por lote. Se fijó `spark.sql.shuffle.partitions=4` en `streaming_job.py` y los lotes bajaron a 30-60 s, con raw al día.
+   - **Kafka perdía los eventos con `docker compose down`:** el volumen `kafka-data` se monta en `/var/lib/kafka/data`, pero la imagen `apache/kafka` guarda los logs en `/tmp/kraft-combined-logs` dentro del contenedor. Después del `down` el topic quedó vacío y raw arrancó en 0. Se agregó `KAFKA_LOG_DIRS: /var/lib/kafka/data` en `docker-compose.yml` para que Kafka use el volumen, y se le dio más margen al healthcheck (`retries: 20`, `start_period: 60s`).
+   - **Descarga del conector:** el primer `spark-submit` falló con `unresolved dependency: spark-sql-kafka-0-10_2.12;3.5.3: not found` por un corte de red. Se resolvió borrando la caché de Ivy (`/root/.ivy2`) y relanzando.
+
+5. **Enlaces:** Issues #18 a #22 · PR #__ (integración), PR #__ (quality gate), PR #__ (README) · Actions `Release RapidGo` (una ejecución por integrante) · release v1.0.0 · video final.
