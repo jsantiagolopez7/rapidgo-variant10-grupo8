@@ -20,7 +20,7 @@ Versión final del proyecto: pipeline completo de eventos de inventario y pickin
 
 ### PRs de la Semana 4
 - #__ Integración y estabilización end-to-end (Jhonatan Santiago López) · closes #18, #17
-- #__ Quality gate y release.yml (Andrey Espitia) · closes #19
+- #33 Quality gate y release.yml (Andrey Espitia) · closes #19
 - #__ README final y tabla de contribuciones (Eric Vargas) · closes #20, #16
 
 ### Releases anteriores
