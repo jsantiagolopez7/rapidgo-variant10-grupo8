@@ -8,7 +8,34 @@
 
    **Mensaje real del log** (`check_sources`, intento 3):
    ```
-   <PEGAR AQUÍ LAS LÍNEAS DEL LOG: la línea "ERROR - Task failed with exception", la línea de ErrorCalidad y la línea "Marking task as FAILED">
+   run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=1.log:46:    raise ErrorCalidad(f"La fuente
+{ruta} no existe. ¿Corrió el job de Spark?")
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=1.log:47:calidad_inventario.ErrorCalidad: La
+fuente /opt/airflow/datalake/raw/inventory_events no existe. ¿Corrió el job de Spark?
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=1.log:115:    raise ErrorCalidad(f"La fuente
+{ruta} no existe. ¿Corrió el job de Spark?")
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=1.log:116:calidad_inventario.ErrorCalidad: La
+fuente /opt/airflow/datalake/raw/inventory_events no existe. ¿Corrió el job de Spark?
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=2.log:46:    raise ErrorCalidad(f"La fuente
+{ruta} no existe. ¿Corrió el job de Spark?")
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=2.log:47:calidad_inventario.ErrorCalidad: La
+fuente /opt/airflow/datalake/raw/inventory_events no existe. ¿Corrió el job de Spark?
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=2.log:115:    raise ErrorCalidad(f"La fuente
+{ruta} no existe. ¿Corrió el job de Spark?")
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=2.log:116:calidad_inventario.ErrorCalidad: La
+fuente /opt/airflow/datalake/raw/inventory_events no existe. ¿Corrió el job de Spark?
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=3.log:46:    raise ErrorCalidad(f"La fuente
+{ruta} no tiene archivos Parquet (raw vacío).")
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=3.log:47:calidad_inventario.ErrorCalidad: La
+fuente /opt/airflow/datalake/processed/inventory_events no tiene archivos Parquet (raw vacío).
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=3.log:48:[2026-11-08T03:45:31.979+0000]
+{taskinstance.py:1226} INFO - Marking task as FAILED. dag_id=rapidgo_g8_inventario_diario, task_id=check_sources,
+run_id=manual__2026-11-08T03:42:04+00:00, execution_date=20261108T034204, start_date=20261108T034531,
+end_date=20261108T034531
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=3.log:115:    raise ErrorCalidad(f"La fuente
+{ruta} no tiene archivos Parquet (raw vacío).")
+run_id=manual__2026-11-08T03_42_04+00_00\task_id=check_sources\attempt=3.log:116:calidad_inventario.ErrorCalidad: La
+fuente /opt/airflow/datalake/processed/inventory_events no tiene archivos Parquet (raw vacío).
    ```
 
 4. **Tareas afectadas:** `validate_raw`, `aggregate_daily_kpis`, `validate_curated` y `generate_report` quedaron en `upstream_failed`. No se escribieron KPIs diarios ni reporte para esa ejecución, que es lo que buscábamos: no publicar KPIs sobre datos vacíos.

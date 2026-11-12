@@ -53,7 +53,7 @@ Detalle en [docs/arquitectura.md](docs/arquitectura.md). Decisiones principales:
 ## 4. Ejecución local
 
 ### Prerequisitos
-- Docker Desktop (o Docker Engine) con Docker Compose v2 y al menos 6 GB de RAM asignados.
+- Docker Desktop (o Docker Engine) con Docker Compose v2 y al menos 4 GB de RAM para Docker. En Windows con WSL2 el límite se ajusta en `%UserProfile%\.wslconfig` (`[wsl2]` y `memory=4GB`). Con poca RAM, levanta primero `kafka kafka-init spark-master` y Airflow al final.
 - Git.
 - Python 3.12 (solo para correr las pruebas fuera de Docker).
 - Puertos libres: 29092 (Kafka), 8080 y 7077 (Spark), 8081 (Airflow).
@@ -171,7 +171,7 @@ Las pruebas cubren el contrato del evento, producer, transformaciones de Spark, 
 | Ajuste de alertas (ADR-002) | STOCK_CRITICO pasó de dispararse en el 69 % de los eventos (4.245 alertas) a solo cuando un picking deja el stock bajo. |
 | DAG, 08/11/2026 | 5 tasks en `success`: 1.531 eventos en raw, 0 inválidos, KPIs diarios para 8 tiendas y reporte generado. |
 | Fallo controlado, 08/11/2026 | `check_sources` falló en sus 3 intentos y las 4 tasks siguientes quedaron en `upstream_failed`; tras *Clear* la ejecución terminó en verde en 25 s. |
-| Integración final, <FECHA> | <COMPLETAR con los valores de docs/checkpoints/semana4.md> |
+| Integración final desde cero, 11/11/2026 | 3.731 eventos (+59 duplicados); raw 3.790, processed 3.731, 24 filas de KPIs y 884 alertas. Picking promedio 163,3 s, p95 240 s, stockout 42,55 %. DAG en verde con 0 eventos fuera del contrato, KPIs para 8 tiendas y 988 de 1.442 pedidos incompletos. |
 
 Capturas en [docs/checkpoints/](docs/checkpoints/). Checkpoints: [Semana 1](docs/checkpoints/semana1.md) · [Semana 2](docs/checkpoints/semana2.md) · [Semana 3](docs/checkpoints/semana3.md) · [Semana 4](docs/checkpoints/semana4.md).
 
@@ -187,8 +187,8 @@ Capturas en [docs/checkpoints/](docs/checkpoints/). Checkpoints: [Semana 1](docs
 
 | Integrante | Responsabilidades | Issues principales | PRs principales |
 |---|---|---|---|
-| Jhonatan Santiago López | Repositorio, Kanban y estructura (S1); producer de eventos (S2); DAG de Airflow, ADR-003 y release v0.3.0 (S3); integración end-to-end (S4) | #1, #2, #9, #14, #17, #18 | #23, #27, #29, #__ |
-| Andrey Espitia | Arquitectura, contrato JSON y KPIs (S1); job de Spark, alertas y Parquet (S2); CI ampliado del DAG y pruebas de calidad (S3); quality gate y release v1.0.0 (S4) | #3, #4, #5, #10, #11, #15, #19 | #24, #30, #__ |
+| Jhonatan Santiago López | Repositorio, Kanban y estructura (S1); producer de eventos (S2); DAG de Airflow, ADR-003 y release v0.3.0 (S3); integración end-to-end (S4) | #1, #2, #9, #14, #17, #18 | #23, #27, #29, #34 |
+| Andrey Espitia | Arquitectura, contrato JSON y KPIs (S1); job de Spark, alertas y Parquet (S2); CI ampliado del DAG y pruebas de calidad (S3); quality gate y release v1.0.0 (S4) | #3, #4, #5, #10, #11, #15, #19 | #24, #30, #33 |
 | Eric Vargas | docker-compose, README y ADR-001 (S1); pruebas, CI, ADR-002 y release v0.2.0 (S2); fallo controlado y checkpoint 3 (S3); README final (S4) | #6, #7, #8, #12, #13, #16, #20 | #25, #28, #31, #32, #__ |
 | Todos | Revisión cruzada de PRs, `workflow_dispatch` y video final | #21, #22 | - |
 
