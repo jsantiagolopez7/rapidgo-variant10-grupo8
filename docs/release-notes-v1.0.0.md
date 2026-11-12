@@ -15,13 +15,13 @@ Versión final del proyecto: pipeline completo de eventos de inventario y pickin
 ### Novedades de la Semana 4
 - Workflow `release.yml` (quality gate + publicación del release con `workflow_dispatch`).
 - README final y corrección de la documentación del CI (ADR-003).
-- Integración end-to-end verificada desde cero siguiendo el README.
+- Integración end-to-end verificada desde cero siguiendo el README: Spark con 4 particiones de shuffle (lotes de 623 s a 30-60 s) y Kafka persistente en su volumen.
 - Cierre o justificación de todos los Issues del tablero.
 
 ### PRs de la Semana 4
-- #__ Integración y estabilización end-to-end (Jhonatan Santiago López) · closes #18, #17
+- #34 Integración y estabilización end-to-end (Jhonatan Santiago López) · closes #18, #17
 - #33 Quality gate y release.yml (Andrey Espitia) · closes #19
-- #__ README final y tabla de contribuciones (Eric Vargas) · closes #20, #16
+- README final y tabla de contribuciones (Eric Vargas) · closes #20, #16
 
 ### Releases anteriores
 v0.1.0-foundation · v0.2.0-streaming · v0.3.0-orchestration
