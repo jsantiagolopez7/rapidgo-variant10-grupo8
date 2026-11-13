@@ -2,7 +2,7 @@
 
 Versión final del proyecto: pipeline completo de eventos de inventario y picking, con quality gate en GitHub Actions.
 
-**Video final:** <ENLACE AL VIDEO>
+**Video final:** https://drive.google.com/drive/folders/1e-yPPIMx5dIkdR79krz2FH8zi5PwIf0o?usp=sharing
 
 ### Qué incluye
 - **Ingesta:** producer de eventos de inventario y picking con key `store_id`, topic `rapidgo.g8.inventory.events` (3 particiones, Kafka 3.9 en KRaft).
