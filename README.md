@@ -2,7 +2,7 @@
 
 Proyecto final de Big Data (Línea de Profundización I) · **Grupo 8** · Release final **v1.0.0**
 
-**Video final (≤ 10 min):** <ENLACE AL VIDEO>
+**Video final (≤ 10 min):** [ver en Google Drive](https://drive.google.com/drive/folders/1e-yPPIMx5dIkdR79krz2FH8zi5PwIf0o?usp=sharing)
 
 | Integrante | GitHub |
 |---|---|
@@ -189,7 +189,7 @@ Capturas en [docs/checkpoints/](docs/checkpoints/). Checkpoints: [Semana 1](docs
 |---|---|---|---|
 | Jhonatan Santiago López | Repositorio, Kanban y estructura (S1); producer de eventos (S2); DAG de Airflow, ADR-003 y release v0.3.0 (S3); integración end-to-end (S4) | #1, #2, #9, #14, #17, #18 | #23, #27, #29, #34 |
 | Andrey Espitia | Arquitectura, contrato JSON y KPIs (S1); job de Spark, alertas y Parquet (S2); CI ampliado del DAG y pruebas de calidad (S3); quality gate y release v1.0.0 (S4) | #3, #4, #5, #10, #11, #15, #19 | #24, #30, #33 |
-| Eric Vargas | docker-compose, README y ADR-001 (S1); pruebas, CI, ADR-002 y release v0.2.0 (S2); fallo controlado y checkpoint 3 (S3); README final (S4) | #6, #7, #8, #12, #13, #16, #20 | #25, #28, #31, #32, #__ |
+| Eric Vargas | docker-compose, README y ADR-001 (S1); pruebas, CI, ADR-002 y release v0.2.0 (S2); fallo controlado y checkpoint 3 (S3); README final (S4) | #6, #7, #8, #12, #13, #16, #20 | #25, #28, #31, #32, #35 |
 | Todos | Revisión cruzada de PRs, `workflow_dispatch` y video final | #21, #22 | - |
 
 Releases: [v0.1.0-foundation](../../releases/tag/v0.1.0-foundation) · [v0.2.0-streaming](../../releases/tag/v0.2.0-streaming) · [v0.3.0-orchestration](../../releases/tag/v0.3.0-orchestration) · [v1.0.0](../../releases/tag/v1.0.0)
